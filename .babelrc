@@ -10,7 +10,5 @@
       }
     ]
   ],
-  "plugins": [
-    ["@emotion/babel-plugin", { "ssr": true, "displayName": true, "preprocess": false }]
-  ]
+  "plugins": [["@emotion/babel-plugin", { "ssr": true, "displayName": true, "preprocess": false }]]
 }
