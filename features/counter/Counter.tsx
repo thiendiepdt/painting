@@ -7,7 +7,7 @@ import { IconButton } from '@material-ui/core'
 import { AiOutlineCheckCircle } from 'react-icons/ai'
 import AccessTimeIcon from '@material-ui/icons/AccessTime'
 import { FaRegHeart } from 'react-icons/fa'
-import RippleButton from '../../components/button/RippleButton'
+import RippleButton from '../../components/Button/RippleButton'
 
 const Counter: FC = () => {
   const dispatch: AppDispatch = useDispatch()

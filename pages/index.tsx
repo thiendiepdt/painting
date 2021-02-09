@@ -1,7 +1,32 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
+import BlobComponent from '../components/BlobComponent'
+import Goo from '../components/BlobComponent/Goo'
+import { Box, Grid, Typography } from '@material-ui/core'
+import { makeStyles } from '@material-ui/core/styles'
+import Link from 'next/link'
+
+const useHomeStyles = makeStyles((theme) => {
+  return {
+    appRoot: {
+      margin: theme.spacing(2),
+    },
+    appContainer: {
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    appTitle: {
+      fontFamily: 'Pacifico',
+    },
+  }
+})
 
 export default function Home(): JSX.Element {
+  const classes = useHomeStyles()
+
   return (
     <div className={styles.container}>
       <Head>
@@ -10,49 +35,45 @@ export default function Home(): JSX.Element {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a href="https://github.com/vercel/next.js/tree/master/examples" className={styles.card}>
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>Instantly deploy your Next.js site to a public URL with Vercel.</p>
-          </a>
-        </div>
+        <Goo />
+        <Grid container justify="center" spacing={2}>
+          <Grid item>
+            <BlobComponent>
+              <Box className={classes.appContainer}>
+                <Typography variant="h3" className={classes.appTitle}>
+                  Vẽ Vời
+                </Typography>
+              </Box>
+            </BlobComponent>
+          </Grid>
+          <Grid item>
+            <Link href="/dst-map" passHref>
+              <a>
+                <BlobComponent>
+                  <Box className={classes.appContainer}>
+                    <Typography variant="h3" className={classes.appTitle}>
+                      {'DST Map'}
+                    </Typography>
+                  </Box>
+                </BlobComponent>
+              </a>
+            </Link>
+          </Grid>
+          <Grid item>
+            <Link href="/tiktok" passHref>
+              <a>
+                <BlobComponent>
+                  <Box className={classes.appContainer}>
+                    <Typography variant="h3" className={classes.appTitle}>
+                      {'Tiktok Clip'}
+                    </Typography>
+                  </Box>
+                </BlobComponent>
+              </a>
+            </Link>
+          </Grid>
+        </Grid>
       </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
     </div>
   )
 }
