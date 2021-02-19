@@ -7,7 +7,10 @@ export const useDrawDontStarveTogetherMap = () => {
   const textureRef = useRef<HTMLDivElement>()
   const [file, setFile] = useState<File>()
   const [pixel, setPixel] = useState<number>(2)
-  const [isDrawing] = useState<boolean>(false)
+  const [isDrawing, setIsDrawing] = useState<boolean>(false)
+  const [isReady, setIsReady] = useState<boolean>(false)
+  const ctxRef = useRef<CanvasRenderingContext2D>()
+  const textureMap = useRef<TextureMap>({})
 
   const readFile = async () => {
     return new Promise<MapData>((resolve, reject) => {
@@ -56,15 +59,14 @@ export const useDrawDontStarveTogetherMap = () => {
       while (top >= _canvas.height) {
         top -= _canvas.height
       }
-      canvas.current
-        .getContext('2d')
-        .drawImage(_canvas, left, top, pixel, pixel, x, y, pixel, pixel)
+      ctxRef.current.drawImage(_canvas, left, top, pixel, pixel, x, y, pixel, pixel)
     }
   }
 
   const draw = async () => {
-    const ctx = canvas?.current?.getContext('2d')
-    if (!file || !ctx || !textureRef.current || !canvas.current) return
+    const ctx = (ctxRef.current = canvas?.current?.getContext('2d'))
+    if (!file || !textureRef.current || !ctx) return
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
     const data = await readFile()
     // Tính kích thước của canvas
     const maxRow = Math.max(...data.map((row) => row.length))
@@ -73,20 +75,13 @@ export const useDrawDontStarveTogetherMap = () => {
     // Fill màu nền
     ctx.fillStyle = 'grey'
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-    const textureMap = MINIMAP_GROUND_PROPERTIES.reduce<TextureMap>((prev, curr) => {
-      prev[curr.id] = {
-        url: curr.noise_texture,
-        points: [],
-        canvas: null,
-      }
-      return prev
-    }, {})
-    const textures = Object.values(textureMap)
-    await Promise.all(textures.map((texture) => loadCtx(texture)))
+    Object.values(textureMap.current).forEach((texture) => {
+      texture.points = []
+    })
     data.forEach((row, rowIndex) => {
       row.forEach((col, colIndex) => {
-        if (textureMap[col]) {
-          textureMap[col].points.push({
+        if (textureMap.current[col]) {
+          textureMap.current[col].points.push({
             sx: colIndex, // Vị trí cắt texture
             sy: rowIndex, // Vị trí cắt texture
             x: colIndex * pixel, // Vị trí đặt point trên trục Ox của canvas chính
@@ -95,6 +90,7 @@ export const useDrawDontStarveTogetherMap = () => {
         }
       })
     })
+    const textures = Object.values(textureMap.current)
     for (const texture of textures) {
       drawTexture(texture).catch()
     }
@@ -102,9 +98,30 @@ export const useDrawDontStarveTogetherMap = () => {
 
   useEffect(() => {
     if (file) {
-      draw()
+      setIsDrawing(true)
+      draw().finally(() => {
+        setIsDrawing(false)
+      })
     }
   }, [file, pixel])
+
+  const init = async () => {
+    textureMap.current = MINIMAP_GROUND_PROPERTIES.reduce<TextureMap>((prev, curr) => {
+      prev[curr.id] = {
+        url: curr.noise_texture,
+        points: [],
+        canvas: null,
+      }
+      return prev
+    }, {})
+    const textures = Object.values(textureMap.current)
+    await Promise.all(textures.map((texture) => loadCtx(texture)))
+    setIsReady(true)
+  }
+
+  useEffect(() => {
+    init().catch(console.warn)
+  }, [])
 
   return [
     {
@@ -112,6 +129,7 @@ export const useDrawDontStarveTogetherMap = () => {
       textureRef,
       pixel,
       isDrawing,
+      isReady,
       file,
     },
     {

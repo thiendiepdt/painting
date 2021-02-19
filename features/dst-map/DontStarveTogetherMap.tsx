@@ -5,6 +5,9 @@ import { useDrawDontStarveTogetherMap } from './hooks'
 
 const useStyles = makeStyles((theme) => ({
   root: {},
+  labelRoot: {
+    marginLeft: 0,
+  },
   labelInput: {
     paddingRight: theme.spacing(2),
   },
@@ -13,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
   },
   slider: {
     marginTop: theme.spacing(6),
-    marginLeft: theme.spacing(3),
+    marginLeft: theme.spacing(1),
     width: '100px',
   },
 }))
@@ -21,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
 const DontStarveTogetherMap: FC = () => {
   const classes = useStyles()
   const [
-    { pixel, textureRef, canvas, isDrawing },
+    { pixel, textureRef, canvas, isDrawing, isReady },
     { setFile, setPixel },
   ] = useDrawDontStarveTogetherMap()
 
@@ -45,10 +48,11 @@ const DontStarveTogetherMap: FC = () => {
   }
 
   return (
-    <Box className={classes.root} pt={1} pb={1}>
+    <Box className={classes.root} p={2}>
       <Box>
         <FormControlLabel
           classes={{
+            root: classes.labelRoot,
             label: classes.labelInput,
           }}
           labelPlacement="start"
@@ -56,26 +60,30 @@ const DontStarveTogetherMap: FC = () => {
           label="Chọn file lua"
         />
       </Box>
-      <Box>
-        <Slider
-          className={classes.slider}
-          aria-labelledby="discrete-slider-always"
-          step={2}
-          min={2}
-          max={6}
-          marks={marks}
-          value={pixel}
-          onChangeCommitted={(e, value) => {
-            setPixel(value as number)
-          }}
-          valueLabelDisplay="on"
-        />
-      </Box>
+      <div ref={textureRef} style={{ display: 'none' }} />
+      {isReady && (
+        <Box>
+          <Slider
+            className={classes.slider}
+            aria-labelledby="discrete-slider-always"
+            step={2}
+            min={2}
+            max={6}
+            marks={marks}
+            value={pixel}
+            disabled={isDrawing || !isReady}
+            onChangeCommitted={(e, value) => {
+              setPixel(value as number)
+            }}
+            valueLabelDisplay="on"
+          />
+        </Box>
+      )}
       {isDrawing && <Typography>Đang vẽ</Typography>}
-      {!isDrawing && (
+      {!isReady && <Typography>Đang chuẩn bị textures</Typography>}
+      {isReady && (
         <Box className={classes.canvasContainer}>
           <canvas ref={canvas} />
-          <div ref={textureRef} style={{ display: 'none' }} />
         </Box>
       )}
     </Box>
