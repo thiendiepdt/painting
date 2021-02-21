@@ -8,6 +8,7 @@ const styles = () => {
   return createStyles({
     root: {
       maxWidth: '1028px',
+      height: '70px',
     },
     logo1: {
       width: '28px',
